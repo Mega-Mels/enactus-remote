@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import DonationForm from '@/components/donations/DonationForm'
+import { Heart, PieChart, Users, Zap, CheckCircle2 } from 'lucide-react'
 
 type RecentDonor = {
   donor_name: string
@@ -30,109 +31,112 @@ export default function DonatePage() {
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
-    const hours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-    
+    const diffInMs = now.getTime() - date.getTime()
+    const hours = Math.floor(diffInMs / (1000 * 60 * 60))
     if (hours < 1) return 'Just now'
-    if (hours === 1) return '1 hour ago'
-    if (hours < 24) return `${hours} hours ago`
-    if (hours < 48) return 'Yesterday'
-    const days = Math.floor(hours / 24)
-    return `${days} days ago`
+    if (hours === 1) return '1h ago'
+    if (hours < 24) return `${hours}h ago`
+    return `${Math.floor(hours / 24)}d ago`
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <header className="mb-16 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-            Support Our Mission
+    <div className="min-h-screen bg-slate-100">
+      {/* High-Contrast Hero Header */}
+      <div className="bg-slate-900 pt-16 pb-24 px-4 relative overflow-hidden text-center">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 mb-6">
+            <Heart size={12} className="fill-current" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Community Impact</span>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-6">
+            Fuel the <span className="text-yellow-500">Mission.</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-            Your donation helps us train more youth and create sustainable remote work opportunities across Eswatini.
+          <p className="text-lg text-slate-400 max-w-xl mx-auto font-medium">
+            Your contributions directly fund certifications and infrastructure for Eswatini's digital future.
           </p>
-        </header>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20 pb-24">
+        {/* items-start prevents the right column from stretching awkwardly */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 items-start">
           
-          {/* Left Column: Donation Form */}
-          <div className="flex flex-col justify-start">
+          {/* Left Column: Donation Form Container */}
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-slate-900/10 border border-slate-200">
+            <div className="mb-10">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Make a Contribution</h2>
+              <p className="text-sm text-slate-500 font-medium mt-1">Select an amount to empower Swati youth.</p>
+            </div>
             <DonationForm />
           </div>
 
           {/* Right Column: Impact Section */}
           <div className="space-y-8">
-            
-            {/* Where Money Goes */}
-            <section className="rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
-              <h3 className="mb-6 text-xl font-bold text-slate-900">Where Your Money Goes</h3>
+            <section className="rounded-[2rem] bg-white p-8 shadow-sm border border-slate-200">
+              <div className="flex items-center gap-3 mb-8">
+                 <div className="p-2 bg-slate-900 rounded-xl text-yellow-500">
+                    <PieChart size={18} />
+                 </div>
+                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Resource Allocation</h3>
+              </div>
               <div className="space-y-6">
                 {[
-                  { label: 'Youth Training Programs', percent: 60, color: 'bg-yellow-500' },
-                  { label: 'Platform Maintenance', percent: 20, color: 'bg-blue-500' },
-                  { label: 'Community Outreach', percent: 15, color: 'bg-green-500' },
-                  { label: 'Administrative Costs', percent: 5, color: 'bg-slate-400' },
+                  { label: 'Youth Training', percent: 60, color: 'bg-yellow-500' },
+                  { label: 'Platform Infrastructure', percent: 20, color: 'bg-slate-900' },
+                  { label: 'Outreach & Growth', percent: 15, color: 'bg-emerald-500' },
+                  { label: 'Admin', percent: 5, color: 'bg-slate-300' },
                 ].map((item) => (
                   <div key={item.label}>
-                    <div className="mb-2 flex justify-between text-sm font-semibold">
-                      <span>{item.label}</span>
-                      <span className="text-slate-500">{item.percent}%</span>
+                    <div className="mb-2 flex justify-between text-xs font-black uppercase tracking-tight">
+                      <span className="text-slate-700">{item.label}</span>
+                      <span className="text-slate-400">{item.percent}%</span>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                      <div 
-                        className={`h-full ${item.color} transition-all duration-1000`} 
-                        style={{ width: `${item.percent}%` }}
-                      />
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full">
+                      <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.percent}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* Recent Donors */}
-            <section className="rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
-              <h3 className="mb-6 text-xl font-bold text-slate-900">Recent Donors</h3>
-              {recentDonors.length === 0 ? (
-                <p className="italic text-slate-500 text-center py-4">Be the first to donate!</p>
-              ) : (
-                <div className="space-y-4">
-                  {recentDonors.map((donor, index) => (
-                    <div key={index} className="flex items-center justify-between border-b border-slate-50 pb-3 last:border-0">
-                      <div>
-                        <p className="font-bold text-slate-800">{donor.donor_name || 'Anonymous'}</p>
-                        <p className="text-sm text-slate-500">donated E{donor.amount}</p>
-                      </div>
-                      <span className="text-xs font-medium text-slate-400">{getTimeAgo(donor.created_at)}</span>
+            <section className="rounded-[2rem] bg-white p-8 shadow-sm border border-slate-200">
+               <div className="flex items-center gap-3 mb-8">
+                 <div className="p-2 bg-slate-900 rounded-xl text-yellow-500">
+                    <Users size={18} />
+                 </div>
+                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Recent Backers</h3>
+              </div>
+              <div className="space-y-4">
+                {recentDonors.map((donor, index) => (
+                  <div key={index} className="flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400">
+                          {donor.donor_name ? donor.donor_name[0].toUpperCase() : 'A'}
+                       </div>
+                       <div>
+                          <p className="text-sm font-black text-slate-900">{donor.donor_name || 'Anonymous'}</p>
+                          <p className="text-[10px] font-bold text-emerald-500 uppercase">E{donor.amount} Contribution</p>
+                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <span className="text-[10px] font-black text-slate-300 uppercase">{getTimeAgo(donor.created_at)}</span>
+                  </div>
+                ))}
+              </div>
             </section>
 
-            {/* Impact Stats */}
-            <section className="rounded-2xl bg-slate-900 p-8 text-white shadow-lg">
-              <h3 className="mb-6 text-xl font-bold">Your Impact</h3>
-              <ul className="space-y-4 text-sm font-medium text-slate-300">
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 font-bold">✓</span> 
-                  <span>E100 provides course materials for 2 students</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 font-bold">✓</span> 
-                  <span>E250 sponsors one certification exam</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 font-bold">✓</span> 
-                  <span>E500 covers internet access for 10 students</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 font-bold">✓</span> 
-                  <span>E1,000 funds a full training workshop</span>
-                </li>
+            <section className="rounded-[2rem] bg-slate-900 p-10 text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10"><Zap size={80} /></div>
+              <h3 className="mb-8 text-xl font-black tracking-tight">Impact Scale</h3>
+              <ul className="space-y-5">
+                {['E100 provides course materials for 2 students', 'E250 sponsors one certification exam', 'E500 covers internet for 10 learners'].map((text, i) => (
+                  <li key={i} className="flex items-start gap-4">
+                    <CheckCircle2 size={18} className="text-yellow-500 mt-0.5" /> 
+                    <span className="text-sm font-bold text-slate-300">{text}</span>
+                  </li>
+                ))}
               </ul>
             </section>
-
           </div>
         </div>
       </div>

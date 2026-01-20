@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ApplicationForm from '@/components/jobs/ApplicationForm'
+import { ArrowLeft, MapPin, Briefcase, Building2, Calendar, DollarSign, ExternalLink, CheckCircle2 } from 'lucide-react'
 
 type PageProps = {
   params: Promise<{ id: string }>
@@ -11,21 +12,16 @@ export default async function JobDetailPage({ params }: PageProps) {
   const { id } = await params
   const supabase = await createClient()
 
-  // Fetch job details
   const { data: job, error } = await supabase
     .from('jobs')
     .select('*')
     .eq('id', id)
     .single()
 
-  if (error || !job) {
-    notFound()
-  }
+  if (error || !job) notFound()
 
-  // Get current user
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Check if user already applied
   let hasApplied = false
   if (user) {
     const { data: application } = await supabase
@@ -33,116 +29,147 @@ export default async function JobDetailPage({ params }: PageProps) {
       .select('id')
       .eq('job_id', id)
       .eq('user_id', user.id)
-      .maybeSingle() // Use maybeSingle to avoid errors if no application exists
+      .maybeSingle()
 
     hasApplied = !!application
   }
 
   const getTypeColor = (type: string) => {
     switch(type?.toLowerCase()) {
-      case 'remote': return 'bg-blue-100 text-blue-700'
-      case 'hybrid': return 'bg-green-100 text-green-700'
-      case 'contract': return 'bg-orange-100 text-orange-700'
-      default: return 'bg-gray-100 text-gray-700'
+      case 'remote': return 'bg-blue-50 text-blue-600 border-blue-100'
+      case 'hybrid': return 'bg-emerald-50 text-emerald-600 border-emerald-100'
+      case 'contract': return 'bg-amber-50 text-amber-600 border-amber-100'
+      default: return 'bg-slate-50 text-slate-600 border-slate-100'
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Link 
           href="/opportunities" 
-          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 mb-8"
+          className="group inline-flex items-center text-sm font-black text-slate-400 hover:text-slate-900 mb-10 transition-colors uppercase tracking-widest"
         >
-          ← Back to Opportunities
+          <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Listings
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Job Details */}
           <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${getTypeColor(job.job_type)}`}>
-                  {job.job_type?.toUpperCase()}
+            <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-200">
+              <div className="flex flex-wrap gap-3 mb-8">
+                <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${getTypeColor(job.job_type)}`}>
+                  {job.job_type}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700">
+                <span className="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-600 border border-slate-200">
                   {job.category}
                 </span>
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
-              <p className="text-xl text-gray-600 mb-6">{job.company}</p>
-
-              <div className="flex items-center text-gray-500 text-sm gap-4 mb-8">
-                <span className="font-bold text-green-600">{job.salary_range}</span>
-                <span>•</span>
-                <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+              <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter leading-tight">
+                {job.title}
+              </h1>
+              
+              <div className="flex flex-wrap items-center gap-6 text-slate-500 mb-10">
+                <div className="flex items-center gap-2 font-bold text-sm">
+                  <Building2 size={18} className="text-slate-400" />
+                  {job.company}
+                </div>
+                <div className="flex items-center gap-2 font-bold text-sm">
+                  <DollarSign size={18} className="text-emerald-500" />
+                  <span className="text-slate-900">{job.salary_range}</span>
+                </div>
+                <div className="flex items-center gap-2 font-bold text-sm">
+                  <Calendar size={18} className="text-slate-400" />
+                  Posted {new Date(job.created_at).toLocaleDateString()}
+                </div>
               </div>
 
-              <div className="prose prose-yellow max-w-none">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Job Description</h3>
-                <p className="text-gray-600 leading-relaxed mb-6">{job.description}</p>
+              <div className="space-y-10">
+                <section>
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Job Description</h3>
+                  <div className="text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
+                    {job.description}
+                  </div>
+                </section>
                 
                 {job.requirements && (
-                  <>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Requirements</h3>
-                    <p className="text-gray-600 leading-relaxed">{job.requirements}</p>
-                  </>
+                  <section>
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Requirements</h3>
+                    <div className="text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
+                      {job.requirements}
+                    </div>
+                  </section>
                 )}
               </div>
 
               {job.external_url && (
-                <div className="mt-8 p-4 bg-yellow-50 rounded-xl border border-yellow-100">
-                  <p className="text-sm text-yellow-800 mb-3 font-medium">This position is hosted externally:</p>
+                <div className="mt-12 p-8 bg-slate-900 rounded-[2rem] text-white">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="p-3 bg-yellow-500/20 rounded-xl">
+                      <ExternalLink className="text-yellow-500" size={24} />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-lg">Apply Externally</h4>
+                      <p className="text-slate-400 text-sm font-medium">This application is hosted on the company's official portal.</p>
+                    </div>
+                  </div>
                   <a 
                     href={job.external_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-block bg-yellow-500 text-black px-6 py-2 rounded-lg font-bold hover:bg-yellow-600 transition"
+                    className="flex items-center justify-center w-full bg-yellow-500 text-slate-900 py-4 rounded-xl font-black hover:bg-yellow-400 transition shadow-xl shadow-yellow-500/10"
                   >
-                    View on company website →
+                    Go to Application Portal
                   </a>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Application Sidebar */}
+          {/* Sidebar Area */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-8">
+            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200 sticky top-24">
               {user ? (
                 hasApplied ? (
                   <div className="text-center py-6">
-                    <div className="bg-green-100 text-green-700 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                      ✅
+                    <div className="bg-emerald-50 text-emerald-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-emerald-100">
+                      <CheckCircle2 size={32} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Application Submitted</h3>
-                    <p className="text-sm text-gray-500">
-                      You've already applied for this position. We'll notify you of any updates.
+                    <h3 className="text-xl font-black text-slate-900 mb-2 tracking-tight">Saved to Profile</h3>
+                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                      You've expressed interest in this role. Check your dashboard to track your career progress.
                     </p>
                   </div>
                 ) : (
-                  <ApplicationForm jobId={id} jobTitle={job.title} />
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Apply for Role</h3>
+                    <ApplicationForm jobId={id} jobTitle={job.title} />
+                  </div>
                 )
               ) : (
-                <div className="text-center py-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Ready to Apply?</h3>
-                  <p className="text-sm text-gray-500 mb-6">
-                    You need to be logged in to apply for this position.
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Briefcase size={32} className="text-slate-300" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 mb-3 tracking-tight">Join the Network</h3>
+                  <p className="text-sm text-slate-500 font-medium mb-8 leading-relaxed">
+                    You must be a member of the Enactus Remote community to apply for this lead.
                   </p>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <Link 
                       href="/login" 
-                      className="block w-full bg-gray-900 text-white py-2 rounded-lg font-bold hover:bg-gray-800 transition"
+                      className="block w-full bg-slate-900 text-white py-4 rounded-xl font-black hover:bg-slate-800 transition shadow-lg shadow-slate-900/10"
                     >
                       Log In
                     </Link>
                     <Link 
                       href="/signup" 
-                      className="block w-full border border-gray-200 text-gray-700 py-2 rounded-lg font-bold hover:bg-gray-50 transition"
+                      className="block w-full border border-slate-200 text-slate-700 py-4 rounded-xl font-black hover:bg-slate-50 transition"
                     >
-                      Sign Up
+                      Create Account
                     </Link>
                   </div>
                 </div>

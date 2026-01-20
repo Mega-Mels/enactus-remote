@@ -2,221 +2,142 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
+import { CreditCard, ShieldCheck, User, Mail, Send, Loader2 } from 'lucide-react'
 
 export default function DonationForm() {
-  const [amount, setAmount] = useState(100)
-  const [customAmount, setCustomAmount] = useState('')
-  const [selectedAmount, setSelectedAmount] = useState<number | 'custom'>(100)
   const [paymentMethod, setPaymentMethod] = useState('momo')
-  const [donorName, setDonorName] = useState('')
-  const [email, setEmail] = useState('')
+  const [selectedAmount, setSelectedAmount] = useState<number | 'custom'>(100)
+  const [amount, setAmount] = useState(100)
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
 
-  const presetAmounts = [100, 250, 500, 1000]
-
-  const handleAmountSelect = (value: number | 'custom') => {
-    setSelectedAmount(value)
-    if (value === 'custom') {
-      setAmount(0)
-    } else {
-      setAmount(value)
-      setCustomAmount('')
-    }
-  }
-
-  const handleCustomAmountChange = (value: string) => {
-    setCustomAmount(value)
-    setAmount(Number(value) || 0)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
-    try {
-      if (amount < 10) {
-        throw new Error('Minimum donation amount is E10')
-      }
-      const { error: donationError } = await supabase
-        .from('donations')
-        .insert({
-          donor_name: donorName || 'Anonymous',
-          email: email,
-          amount: amount,
-          currency: 'SZL',
-          payment_method: paymentMethod,
-          status: 'pending'
-        })
-
-      if (donationError) throw donationError
-      setSuccess(true)
-      
-      setTimeout(() => {
-        setSuccess(false)
-        setDonorName('')
-        setEmail('')
-        setSelectedAmount(100)
-        setAmount(100)
-        setCustomAmount('')
-      }, 5000)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Official Logo URLs
+  const MTN_LOGO = "https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg"
+  const PAYPAL_LOGO = "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
 
   return (
-    <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl sm:p-10">
-      <h2 className="mb-8 text-center text-3xl font-extrabold text-slate-900">Make a Donation</h2>
-
-      {success && (
-        <div className="mb-8 rounded-lg bg-green-50 p-4 text-center text-green-800 border border-green-200 animate-in fade-in zoom-in duration-300">
-          <p className="font-bold text-lg">✅ Thank you for your donation of E{amount}!</p>
-          <p className="text-sm">You&apos;ll receive a confirmation email shortly.</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Amount Selection */}
-        <div>
-          <label className="mb-3 block text-sm font-bold text-slate-700 uppercase tracking-wide">
-            Choose an amount (E)
-          </label>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-            {presetAmounts.map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => handleAmountSelect(preset)}
-                className={`py-3 px-2 border-2 rounded-xl font-bold transition-all duration-200 ${
-                  selectedAmount === preset
-                    ? 'border-yellow-500 bg-yellow-50 text-yellow-700 shadow-inner'
-                    : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                E{preset}
-              </button>
-            ))}
+    <div className="space-y-10">
+      {/* 1. Amount Selection - High Contrast */}
+      <div className="space-y-4">
+        <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1">
+          Select Contribution (SZL)
+        </label>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {[100, 250, 500, 1000].map((amt) => (
             <button
+              key={amt}
               type="button"
-              onClick={() => handleAmountSelect('custom')}
-              className={`py-3 px-2 border-2 rounded-xl font-bold transition-all duration-200 ${
-                selectedAmount === 'custom'
-                  ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
-                  : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-300'
+              onClick={() => {setSelectedAmount(amt); setAmount(amt)}}
+              className={`py-4 rounded-2xl font-black text-sm transition-all border-2 ${
+                selectedAmount === amt 
+                  ? 'border-yellow-500 bg-yellow-500 text-slate-900 shadow-lg shadow-yellow-500/20' 
+                  : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'
               }`}
             >
-              Custom
+              E{amt}
             </button>
-          </div>
-
-          {selectedAmount === 'custom' && (
-            <div className="mt-4 animate-in slide-in-from-top-2 duration-200">
-              <input
-                type="number"
-                min="10"
-                required
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-500 outline-none transition"
-                placeholder="Enter custom amount (Minimum E10)"
-                value={customAmount}
-                onChange={(e) => handleCustomAmountChange(e.target.value)}
-              />
-            </div>
-          )}
+          ))}
+          <button 
+            type="button"
+            onClick={() => setSelectedAmount('custom')}
+            className={`py-4 rounded-2xl font-black text-xs border-2 transition-all ${
+              selectedAmount === 'custom' 
+                ? 'border-yellow-500 bg-yellow-500 text-slate-900' 
+                : 'border-slate-100 bg-slate-50 text-slate-500'
+            }`}
+          >
+            Custom
+          </button>
         </div>
+      </div>
 
-        {/* Payment Method */}
-        <div>
-          <label className="mb-3 block text-sm font-bold text-slate-700 uppercase tracking-wide">
-            Payment Method
-          </label>
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('momo')}
-              className={`flex flex-col items-center justify-center p-3 border-2 rounded-xl transition-all ${
-                paymentMethod === 'momo'
-                  ? 'border-green-500 bg-green-50 text-green-700'
-                  : 'border-slate-100 text-slate-500 hover:border-slate-300'
-              }`}
-            >
-              <span className="text-xl">📱</span>
-              <span className="text-[10px] font-bold mt-1">MTN MOMO</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('card')}
-              className={`flex flex-col items-center justify-center p-3 border-2 rounded-xl transition-all ${
-                paymentMethod === 'card'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-slate-100 text-slate-500 hover:border-slate-300'
-              }`}
-            >
-              <span className="text-xl">💳</span>
-              <span className="text-[10px] font-bold mt-1">CARD</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentMethod('paypal')}
-              className={`flex flex-col items-center justify-center p-3 border-2 rounded-xl transition-all ${
-                paymentMethod === 'paypal'
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-100 text-slate-500 hover:border-slate-300'
-              }`}
-            >
-              <span className="text-xl">🌐</span>
-              <span className="text-[10px] font-bold mt-1">PAYPAL</span>
-            </button>
-          </div>
+      {/* 2. Payment Methods with Branded Logos */}
+      <div className="space-y-4">
+        <label className="text-[10px] font-black text-slate-900 uppercase tracking-widest ml-1">
+          Payment Method
+        </label>
+        <div className="grid grid-cols-3 gap-4">
+          {/* Card Option */}
+          <button 
+            type="button"
+            onClick={() => setPaymentMethod('card')} 
+            className={`flex flex-col items-center p-5 rounded-3xl border-2 transition-all ${
+              paymentMethod === 'card' ? 'border-slate-900 bg-slate-900 text-white shadow-xl' : 'border-slate-100 bg-slate-50 text-slate-400'
+            }`}
+          >
+            <CreditCard size={24} className={paymentMethod === 'card' ? 'text-yellow-500' : ''} />
+            <span className="text-[9px] font-black mt-2 uppercase">Card</span>
+          </button>
+
+          {/* MoMo Option with Image Logo */}
+          <button 
+            type="button"
+            onClick={() => setPaymentMethod('momo')} 
+            className={`flex flex-col items-center p-5 rounded-3xl border-2 transition-all ${
+              paymentMethod === 'momo' ? 'border-yellow-400 bg-yellow-400 shadow-xl' : 'border-slate-100 bg-slate-50'
+            }`}
+          >
+            <img src={MTN_LOGO} alt="MTN MoMo" className="h-7 w-7 mb-1 object-contain" />
+            <span className="text-[9px] font-black uppercase text-slate-900">MoMo</span>
+          </button>
+
+          {/* PayPal Option with Image Logo */}
+          <button 
+            type="button"
+            onClick={() => setPaymentMethod('paypal')} 
+            className={`flex flex-col items-center p-5 rounded-3xl border-2 transition-all ${
+              paymentMethod === 'paypal' ? 'border-[#003087] bg-[#003087] text-white shadow-xl' : 'border-slate-100 bg-slate-50 text-slate-400'
+            }`}
+          >
+            <img src={PAYPAL_LOGO} alt="PayPal" className="h-6 w-6 mb-1 brightness-0 invert object-contain" />
+            <span className="text-[9px] font-black uppercase">PayPal</span>
+          </button>
         </div>
+      </div>
 
-        {/* Donor Information */}
-        <div className="space-y-4 pt-4">
-          <div>
-            <label className="mb-1 block text-xs font-bold text-slate-500 uppercase">Full Name (Optional)</label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-500 outline-none"
-              placeholder="Your name or 'Anonymous'"
-              value={donorName}
-              onChange={(e) => setDonorName(e.target.value)}
-            />
+      {/* 3. Branded Interaction Card (Dark Theme) */}
+      <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden min-h-[220px] flex flex-col justify-center border border-slate-800">
+        <div className="absolute top-0 right-0 p-8 opacity-10"><ShieldCheck size={100} /></div>
+        
+        {paymentMethod === 'momo' && (
+          <div className="relative z-10 text-center animate-in zoom-in duration-300">
+             <img src={MTN_LOGO} alt="MTN" className="h-12 w-12 mx-auto mb-4" />
+             <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Mobile Money Number</p>
+             <input 
+                type="tel"
+                className="w-full max-w-xs mx-auto block bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4 text-center text-2xl font-black text-yellow-400 outline-none focus:border-yellow-500 transition-all" 
+                placeholder="76•• ••••" 
+             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-bold text-slate-500 uppercase">Email Address *</label>
-            <input
-              type="email"
-              required
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-500 outline-none"
-              placeholder="For receipt"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        )}
+
+        {paymentMethod === 'card' && (
+          <div className="relative z-10 space-y-4 animate-in slide-in-from-right-4">
+             <input className="w-full bg-slate-800 border border-slate-700 rounded-xl px-6 py-4 text-lg font-bold tracking-widest outline-none focus:border-yellow-500 placeholder:text-slate-600" placeholder="CARD NUMBER" />
+             <div className="grid grid-cols-2 gap-4">
+               <input className="bg-slate-800 border border-slate-700 rounded-xl px-6 py-4 text-sm font-bold outline-none" placeholder="MM/YY" />
+               <input className="bg-slate-800 border border-slate-700 rounded-xl px-6 py-4 text-sm font-bold outline-none" placeholder="CVC" />
+             </div>
           </div>
+        )}
+
+        {paymentMethod === 'paypal' && (
+          <div className="relative z-10 text-center animate-in zoom-in">
+             <img src={PAYPAL_LOGO} alt="PayPal" className="h-10 w-10 mx-auto mb-4 brightness-0 invert" />
+             <p className="text-slate-400 text-xs font-black uppercase tracking-widest">Redirecting to Secure Checkout</p>
+          </div>
+        )}
+      </div>
+
+      {/* 4. Donor Information & Final Action */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-slate-900 text-sm outline-none focus:border-slate-900 placeholder:text-slate-400" placeholder="Full Name (Optional)" />
+          <input className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-slate-900 text-sm outline-none focus:border-slate-900 placeholder:text-slate-400" placeholder="Email Address *" required />
         </div>
-
-        {error && <p className="text-sm font-bold text-red-500 italic">⚠️ {error}</p>}
-
-        <button
-          type="submit"
-          disabled={loading || amount < 10}
-          className={`w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 ${
-            loading || amount < 10
-              ? 'bg-slate-300 cursor-not-allowed text-slate-500'
-              : 'bg-yellow-500 text-slate-900 hover:bg-yellow-400'
-          }`}
-        >
-          {loading ? 'Processing...' : `Donate E${amount || '...'} Now`}
+        <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-900 py-6 rounded-[2rem] font-black text-xl shadow-xl shadow-yellow-500/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+          {loading ? <Loader2 className="animate-spin" /> : <>Complete Contribution <Send size={20} /></>}
         </button>
-
-        <p className="text-center text-[11px] text-slate-400 font-medium">
-          🔒 All donations are secure. You will receive an official receipt via email.
-        </p>
-      </form>
+      </div>
     </div>
   )
 }

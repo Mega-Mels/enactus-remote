@@ -4,101 +4,152 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     setLoading(true)
+    setError(null)
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-      if (error) throw error
-
-      router.push('/')
-      router.refresh()
-    } catch (error: any) {
+    if (error) {
       setError(error.message)
-    } finally {
       setLoading(false)
+    } else {
+      router.push('/dashboard')
+      router.refresh()
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to Enactus Remote
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
+      {/* Left Side: Visual/Brand (Hidden on Mobile) */}
+      <section className="hidden lg:flex relative bg-slate-900 flex-col justify-between p-12 overflow-hidden">
+        <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        
+        {/* Branding */}
+        <div className="relative z-10">
+          <Link href="/" className="text-2xl font-black text-white tracking-tighter uppercase">
+            Enactus<span className="text-yellow-500">Remote</span>
+          </Link>
+        </div>
+
+        {/* Value Proposition */}
+        <div className="relative z-10 max-w-md">
+          <h2 className="text-5xl font-black text-white mb-6 leading-tight">
+            The Gateway to <br />
+            <span className="text-yellow-500 text-6xl">Global Talent.</span>
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/signup" className="font-medium text-yellow-600 hover:text-yellow-500">
-              create a new account
-            </Link>
+          <p className="text-slate-400 text-lg font-medium leading-relaxed">
+            Securely access your account to manage your certifications and explore curated job leads for the Swati digital workforce.
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        {/* Footer Meta */}
+        <div className="relative z-10 flex items-center gap-4 text-slate-500 text-sm font-bold">
+          <span className="flex items-center gap-1"><ShieldCheck size={16} className="text-yellow-500" /> Secure Encryption</span>
+          <span className="flex items-center gap-1"><ShieldCheck size={16} className="text-yellow-500" /> 2FA Ready</span>
+        </div>
+      </section>
+
+      {/* Right Side: Login Form */}
+      <section className="flex items-center justify-center p-8 md:p-12 lg:p-24 bg-white">
+        <div className="w-full max-w-md">
+          <div className="mb-10 text-center lg:text-left">
+            <h1 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Welcome Back</h1>
+            <p className="text-slate-500 font-medium">Please enter your credentials to continue.</p>
+          </div>
+
           {error && (
-            <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold rounded-r-lg">
               {error}
             </div>
           )}
-          
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
 
-          <div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">
+                Email Address
+              </label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-yellow-500 transition-colors" size={20} />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 outline-none transition-all font-medium text-slate-900"
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-end ml-1">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-xs font-bold text-slate-400 hover:text-yellow-600 transition">
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-yellow-500 transition-colors" size={20} />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-yellow-500 focus:ring-4 focus:ring-yellow-500/10 outline-none transition-all font-medium text-slate-900"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
+              className="group relative w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 active:scale-[0.98] disabled:opacity-70"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                   Logging In...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  Sign In <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              )}
             </button>
+          </form>
+
+          {/* Social / Link Footer */}
+          <div className="mt-12 text-center border-t border-slate-100 pt-8">
+            <p className="text-slate-500 font-medium">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="text-yellow-600 font-black hover:underline underline-offset-4">
+                Join the network
+              </Link>
+            </p>
           </div>
-        </form>
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

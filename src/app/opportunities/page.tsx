@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import JobCard from '@/components/jobs/JobCard'
 import JobFilter from '@/components/jobs/JobFilter'
-import { Search, MapPin, Briefcase } from 'lucide-react' // Using lucide icons for a premium feel
+import { Search, SlidersHorizontal, Briefcase, Sparkles } from 'lucide-react'
 
 type Job = {
   id: string
@@ -30,7 +30,6 @@ export default function OpportunitiesPage() {
     fetchJobs()
   }, [])
 
-  // Combined Search and Category Filtering
   useEffect(() => {
     let result = jobs
     if (activeFilter !== 'all') {
@@ -64,50 +63,67 @@ export default function OpportunitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Premium Hero Header */}
-      <div className="bg-gray-900 py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            Find Your Next <span className="text-yellow-500">Remote Career</span>
-          </h1>
-          <p className="mt-4 text-xl text-gray-400 max-w-2xl mx-auto">
-            Connecting Eswatini's top talent with global digital opportunities.
-          </p>
-
-          {/* Search Bar UI */}
-          <div className="mt-10 max-w-3xl mx-auto bg-white p-2 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2">
-            <div className="flex-grow flex items-center px-4 border-r border-gray-100">
-              <Search className="text-gray-400 w-5 h-5 mr-3" />
-              <input 
-                type="text"
-                placeholder="Job title or company..."
-                className="w-full py-3 outline-none text-gray-700"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-8 py-3 rounded-xl transition-all">
-              Search Jobs
-            </button>
+    <div className="min-h-screen bg-slate-50">
+      {/* High-Contrast Header Section */}
+      <div className="bg-slate-900 pt-20 pb-32 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 mb-6">
+            <Sparkles size={14} />
+            <span className="text-[10px] font-black uppercase tracking-widest">New Leads Daily</span>
           </div>
+          <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-6">
+            Global <span className="text-yellow-500">Opportunities.</span>
+          </h1>
+          <p className="text-lg text-slate-400 max-w-xl mx-auto font-medium">
+            Curated remote and local roles specifically for Eswatini's growing digital workforce.
+          </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* Sidebar Filters */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 pb-20">
+        {/* Modern Search Bar */}
+        <div className="max-w-4xl mx-auto bg-white p-3 rounded-3xl shadow-2xl shadow-slate-900/10 flex flex-col md:flex-row gap-3 mb-12 border border-slate-100">
+          <div className="flex-grow flex items-center px-4 bg-slate-50 rounded-2xl border border-slate-100 group focus-within:border-yellow-500 transition-colors">
+            <Search className="text-slate-400 w-5 h-5 mr-3 group-focus-within:text-yellow-500" />
+            <input 
+              type="text"
+              placeholder="Search by role or company..."
+              className="w-full py-4 bg-transparent outline-none text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <button className="bg-slate-900 hover:bg-slate-800 text-white font-black px-10 py-4 rounded-2xl transition-all active:scale-[0.98]">
+            Filter Leads
+          </button>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Sidebar Navigation */}
           <aside className="lg:w-1/4">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
+            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 sticky top-24">
+              <div className="flex items-center gap-2 mb-6 text-slate-900">
+                <SlidersHorizontal size={18} className="text-yellow-500" />
+                <h3 className="font-black uppercase tracking-widest text-xs">Refine Search</h3>
+              </div>
+              
               <JobFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-              <div className="mt-8 pt-8 border-t border-gray-100">
-                <h4 className="font-bold text-gray-900 mb-4">Job Type</h4>
-                <div className="space-y-3">
+              
+              <div className="mt-10 pt-8 border-t border-slate-100">
+                <h4 className="font-black text-slate-900 text-xs uppercase tracking-widest mb-6">Employment Type</h4>
+                <div className="space-y-4">
                   {['Remote', 'Hybrid', 'Contract'].map((type) => (
-                    <label key={type} className="flex items-center gap-3 text-gray-600 cursor-pointer hover:text-yellow-600">
-                      <input type="checkbox" className="rounded border-gray-300 text-yellow-500 focus:ring-yellow-500" />
-                      <span className="text-sm font-medium">{type}</span>
+                    <label key={type} className="flex items-center group cursor-pointer">
+                      <div className="relative flex items-center justify-center">
+                        <input type="checkbox" className="peer appearance-none w-5 h-5 border-2 border-slate-200 rounded-lg checked:bg-yellow-500 checked:border-yellow-500 transition-all cursor-pointer" />
+                        <div className="absolute opacity-0 peer-checked:opacity-100 text-slate-900 pointer-events-none">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
+                            <path d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                      <span className="ml-3 text-sm font-bold text-slate-500 group-hover:text-slate-900 transition-colors">{type}</span>
                     </label>
                   ))}
                 </div>
@@ -115,40 +131,43 @@ export default function OpportunitiesPage() {
             </div>
           </aside>
 
-          {/* Main Feed */}
+          {/* Job Feed */}
           <main className="lg:w-3/4">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-gray-500 font-medium">
-                Showing <span className="text-gray-900 font-bold">{filteredJobs.length}</span> opportunities
+            <div className="flex justify-between items-center mb-8 bg-white px-6 py-4 rounded-2xl border border-slate-200 shadow-sm">
+              <p className="text-slate-500 text-sm font-bold">
+                Found <span className="text-slate-900 font-black px-2 py-1 bg-yellow-500/10 rounded-md">{filteredJobs.length}</span> results
               </p>
-              <select className="bg-transparent border-none text-sm font-bold text-gray-700 focus:ring-0 cursor-pointer">
-                <option>Newest First</option>
-                <option>Salary: High to Low</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sort by:</span>
+                <select className="bg-transparent border-none text-sm font-black text-slate-900 focus:ring-0 cursor-pointer">
+                  <option>Recent First</option>
+                  <option>Compensation</option>
+                </select>
+              </div>
             </div>
 
             {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-40 bg-white border border-gray-100 animate-pulse rounded-2xl" />
+              <div className="space-y-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-48 bg-white border border-slate-200 animate-pulse rounded-[2rem]" />
                 ))}
               </div>
             ) : filteredJobs.length === 0 ? (
-              <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-gray-200">
-                <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Briefcase className="text-gray-300 w-10 h-10" />
+              <div className="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+                <div className="bg-slate-50 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <Briefcase className="text-slate-300 w-10 h-10" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No jobs match your search</h3>
-                <p className="text-gray-500 mb-8">Try adjusting your filters or search terms.</p>
+                <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">No leads found</h3>
+                <p className="text-slate-500 font-medium mb-8">Try broadening your search or switching categories.</p>
                 <button
                   onClick={() => {setActiveFilter('all'); setSearchQuery('')}}
-                  className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition"
+                  className="bg-yellow-500 text-slate-900 px-8 py-3 rounded-2xl font-black hover:bg-yellow-400 transition shadow-lg shadow-yellow-200"
                 >
-                  Clear all filters
+                  Reset All Filters
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 pb-20">
+              <div className="space-y-6">
                 {filteredJobs.map((job) => (
                   <JobCard key={job.id} {...job} />
                 ))}

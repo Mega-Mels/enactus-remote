@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import CourseCard from '@/components/courses/CourseCard'
+import { Sparkles, GraduationCap, Search, Filter } from 'lucide-react'
 
 type Course = {
   id: string
@@ -17,7 +18,7 @@ type Course = {
 }
 
 export default function LearningPage() {
-  const [courses, setCourses] = useState<Course[]>([]) // Added Type
+  const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
   const supabase = createClient()
@@ -49,36 +50,48 @@ export default function LearningPage() {
     : courses.filter(c => c.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        
-        {/* Header */}
-        <header className="mb-12 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
-            Enactus Remote Academy
+    <div className="min-h-screen bg-slate-50">
+      {/* High-Contrast Hero Header */}
+      <div className="bg-slate-900 pt-16 pb-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div className="max-w-7xl mx-auto relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 mb-4">
+            <Sparkles size={12} />
+            <span className="text-[9px] font-black uppercase tracking-widest">Global Certifications</span>
+          </div>
+          <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-4">
+            Enactus <span className="text-yellow-500">Remote Academy</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
-            Enhance your profile with industry-recognized certifications and skills.
+          <p className="text-sm md:text-base text-slate-400 max-w-xl mx-auto font-medium">
+            Master high-income digital skills and earn credentials recognized by global hiring partners.
           </p>
-        </header>
+        </div>
+      </div>
 
-        {/* Category Filter */}
-        <div className="mb-10 flex flex-col items-center gap-4">
-          <span className="text-sm font-semibold uppercase tracking-wider text-gray-500">
-            Filter by Category
-          </span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Category Filter - Compact & Professional */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-slate-900 rounded-lg text-yellow-500">
+              <Filter size={16} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Filter by Stream
+            </span>
+          </div>
+          
           <div className="flex flex-wrap justify-center gap-2">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-5 py-2 rounded-xl text-xs font-black transition-all tracking-tight ${
                   activeCategory === category
-                    ? 'bg-gray-900 text-white shadow-md'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+                    ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
                 }`}
               >
-                {category === 'all' ? 'All Courses' : category}
+                {category === 'all' ? 'All Modules' : category}
               </button>
             ))}
           </div>
@@ -88,17 +101,21 @@ export default function LearningPage() {
         {loading ? (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-80 animate-pulse rounded-xl bg-gray-200" />
+              <div key={i} className="h-80 animate-pulse rounded-[2rem] bg-slate-200 border border-slate-100" />
             ))}
           </div>
         ) : filteredCourses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-xl text-gray-500">No courses found in this category.</p>
+          <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+            <div className="bg-slate-50 w-20 h-20 rounded-3xl flex items-center justify-center mb-6 text-slate-300">
+               <GraduationCap size={40} />
+            </div>
+            <h3 className="text-xl font-black text-slate-900 tracking-tight">No modules found</h3>
+            <p className="text-slate-500 font-medium">We're currently updating this stream with new content.</p>
             <button 
               onClick={() => setActiveCategory('all')}
-              className="mt-4 text-blue-600 hover:underline"
+              className="mt-6 text-yellow-600 font-black text-sm hover:underline"
             >
-              Clear filters
+              Back to all courses
             </button>
           </div>
         ) : (
@@ -109,15 +126,22 @@ export default function LearningPage() {
           </div>
         )}
 
-        {/* Stats Footer */}
+        {/* Professional Stats Footer */}
         {!loading && (
-          <footer className="mt-16 border-t border-gray-200 pt-8 text-center">
-            <p className="text-sm text-gray-500">
-              <span className="font-bold text-gray-900">{courses.length}</span> courses available • {' '}
-              <span className="font-bold text-gray-900">
-                {courses.reduce((sum, c) => sum + c.enrollment_count, 0).toLocaleString()}
-              </span> total enrollments
-            </p>
+          <footer className="mt-20 border-t border-slate-200 pt-10 text-center">
+            <div className="inline-flex items-center gap-6 px-8 py-3 bg-white rounded-full border border-slate-200 shadow-sm">
+              <div className="flex flex-col">
+                <span className="text-lg font-black text-slate-900 leading-none">{courses.length}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Modules</span>
+              </div>
+              <div className="w-px h-6 bg-slate-200"></div>
+              <div className="flex flex-col">
+                <span className="text-lg font-black text-slate-900 leading-none">
+                  {courses.reduce((sum, c) => sum + c.enrollment_count, 0).toLocaleString()}
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Learners</span>
+              </div>
+            </div>
           </footer>
         )}
       </div>
