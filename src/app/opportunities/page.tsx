@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase-client'
 import JobCard from '@/components/jobs/JobCard'
 import JobFilter from '@/components/jobs/JobFilter'
 import { Search, SlidersHorizontal, Briefcase, Sparkles } from 'lucide-react'
+import { requireUser } from '@/lib/auth'
+
 
 type Job = {
   id: string
@@ -19,6 +21,7 @@ type Job = {
 }
 
 export default function OpportunitiesPage() {
+  
   const [jobs, setJobs] = useState<Job[]>([])
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([])
   const [activeFilter, setActiveFilter] = useState('all')

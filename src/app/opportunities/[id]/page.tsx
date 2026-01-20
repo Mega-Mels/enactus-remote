@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import ApplicationForm from '@/components/jobs/ApplicationForm'
+import { requireUser } from '@/lib/auth'
 import { ArrowLeft, MapPin, Briefcase, Building2, Calendar, DollarSign, ExternalLink, CheckCircle2 } from 'lucide-react'
 
 type PageProps = {
@@ -9,6 +10,7 @@ type PageProps = {
 }
 
 export default async function JobDetailPage({ params }: PageProps) {
+  await requireUser()
   const { id } = await params
   const supabase = await createClient()
 

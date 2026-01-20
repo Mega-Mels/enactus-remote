@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import CourseCard from '@/components/courses/CourseCard'
 import { Sparkles, GraduationCap, Search, Filter } from 'lucide-react'
+import { requireUser } from '@/lib/auth'
+
 
 type Course = {
   id: string
@@ -18,6 +20,7 @@ type Course = {
 }
 
 export default function LearningPage() {
+  
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')

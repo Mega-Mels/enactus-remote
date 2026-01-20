@@ -4,12 +4,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import ExternalLinkButton from '@/components/courses/ExternalLinkButton'
 import { ArrowLeft, GraduationCap, Award, Globe, ShieldCheck, CheckCircle2 } from 'lucide-react'
+import { requireUser } from '@/lib/auth'
+
 
 type PageProps = {
   params: Promise<{ id: string }>
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
+  await requireUser()
   const { id } = await params
   const supabase = await createClient()
 
