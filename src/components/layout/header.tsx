@@ -136,9 +136,21 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <Link href="/signup" className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-slate-800 transition">
-                Get Started
-              </Link>
+              <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="px-4 py-2.5 rounded-full text-sm font-black text-slate-700 border border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50 transition"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-black hover:bg-slate-800 transition"
+            >
+              Sign Up
+            </Link>
+          </div>
+
             )}
           </div>
 
